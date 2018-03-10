@@ -1,0 +1,21 @@
+{
+  "extends": "eslint-config-airbnb-base",
+  "parser": "babel-eslint",
+  "env": {
+    "browser": true,
+    "node": true,
+    "mocha": true
+  },
+  "plugins": [
+    "vue",
+    "import"
+  ],
+  "rules": {
+    "global-require": "off",
+    "import/no-unresolved": "off",
+    "no-underscore-dangle": "off",
+    "no-new-func": "off",
+    "no-param-reassign": "off",
+    "no-restricted-syntax": "off"
+  }
+}
