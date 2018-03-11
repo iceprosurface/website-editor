@@ -7,7 +7,7 @@ const store = new Vuex.Store({
   state: {
     dataVersion: '0.1'
   },
-  moduleA: {
+  modules: {
     application,
     viewport
   }

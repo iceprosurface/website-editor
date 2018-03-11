@@ -23,7 +23,7 @@ export default {
 }
 </script>
 
-<style lang="less" type="text/less">
+<style lang="less" type="text/less" scoped>
   .page {
     position: absolute;
     top: 0;

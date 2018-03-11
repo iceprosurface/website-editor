@@ -1,16 +1,16 @@
 <template>
   <div id="app">
     <!--<router-view />-->
-    <page></page>
+    <website-editor></website-editor>
   </div>
 </template>
 
 <script>
-import page from './page/pageEditor.vue'
+import websiteEditor from './index.vue'
 export default {
   name: 'App',
   components: {
-    page
+    websiteEditor
   }
 }
 </script>

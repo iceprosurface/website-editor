@@ -1,13 +1,42 @@
 <template>
-  <div class="page-middle">
+  <div class="page-middle" @mouseleave="mouseleave">
+    <component :is="item.key" v-for="(item, key) in viewport" :key="key"></component>
+    <div class="page-root" ref="viewport"></div>
   </div>
 </template>
 
 <script>
+import { mountRoot } from '../service/mount'
+import eventBus from './../service/eventBus'
 export default {
   data () {
     return {
     }
+  },
+  computed: {
+    viewportStore () {
+      return this.$store.state.viewport
+    },
+    applicationStore () {
+      return this.$store.state.application
+    },
+    viewport () {
+      return this.$store.getters['application/getPluginByPosition']('viewport')
+    }
+  },
+  methods: {
+    mountRoot () {
+      let instanceInfo = this.viewportStore.instances.get(this.viewportStore.rootInstanceKey)
+      let component = this.applicationStore.pluginInstance.get(instanceInfo.__className__)
+      mountRoot(this.$refs.viewport, component, false, this.viewportStore.rootInstanceKey, this.$store)
+    },
+    mouseleave () {
+      eventBus.viewportMouseout()
+    }
+  },
+  mounted () {
+    this.$store.commit('viewport/initViewport', this.$refs.viewport)
+    this.mountRoot()
   }
 }
 </script>
@@ -16,5 +45,9 @@ export default {
   .page-middle {
     flex: 1;
     border: 1px solid #333;
+    .page-root {
+      width: 100%;
+      height: 100%;
+    }
   }
 </style>

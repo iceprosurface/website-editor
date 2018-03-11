@@ -1,5 +1,6 @@
 <template>
   <div class="page-left">
+    <component :is="key + '-ui'" v-for="key in keys" :key="key"></component>
   </div>
 </template>
 
@@ -7,7 +8,12 @@
 export default {
   data () {
     return {
+      keys: []
     }
+  },
+  components: {},
+  created () {
+    this.keys = this.$store.state.application.components
   }
 }
 </script>
