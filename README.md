@@ -1,27 +1,12 @@
 # wesite-edit
 
-> A Vue.js project
+这是一个参照 gaea-editor 实现的一个网页编辑器
 
-## Build Setup
+## 使用
 
-``` bash
-# install dependencies
-npm install
+目前暂不支持作为插件用于项目中
 
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-
-# run unit tests
-npm run unit
-
-# run all tests
-npm test
+```bash
+# 运行项目
+cnpm run dev
 ```
-
-For a detailed explanation on how things work, check out the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
