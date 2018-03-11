@@ -1,6 +1,6 @@
 <template>
-  <div class="button-editor">
-    button-editor
+  <div class="container-editor">
+    container-editor
   </div>
 </template>
 
@@ -13,6 +13,6 @@ export default {
 }
 </script>
 <style lang="less" type="text/less">
-  .button-editor {
+  .container-editor {
   }
 </style>

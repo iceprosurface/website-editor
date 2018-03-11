@@ -30,9 +30,6 @@ export default {
       }
       this.isShow = true
     },
-    setCurrentInstance () {
-      this.$store.commit('viewport/setHoverInstanceToActive')
-    },
     setShowOff () {
       this.isShow = false
     }

@@ -9,6 +9,10 @@ export default new Vue({
     domMouseHover (key) {
       this.$store.commit('viewport/setCurrentHoverInstanceKey', key)
       this.$emit('dom-mouse-hover', key)
+    },
+    GlobalClick () {
+      this.$store.commit('viewport/setCurrentInstanceKey', null)
+      this.$emit('global-click')
     }
   },
   store

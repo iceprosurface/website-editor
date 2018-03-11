@@ -2,6 +2,9 @@
  * Created by icepro on 2018/3/10.
  */
 import uniqueId from 'lodash/fp/uniqueId'
+import set from 'lodash/fp/set'
+import get from 'lodash/fp/get'
+
 export default {
   namespaced: true,
   state: {
@@ -31,6 +34,18 @@ export default {
     },
     setCurrentInstanceKey (state, key) {
       state.currentInstanceKey = key
+    },
+    setInstanceProps (state, {vm, key, value}) {
+      if (Object.prototype.toString.call(value) === '[object Object]') {
+        let oldValue = get(vm.$data, key)
+        set(vm.$data, key, {
+          ...oldValue,
+          ...value
+        })
+      } else {
+        set(vm.$data, key, value)
+      }
+      vm.$forceUpdate()
     },
     // TODO: 做成拖拽添加的
     uiClick (state, className) {
