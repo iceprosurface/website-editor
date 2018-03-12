@@ -6,7 +6,6 @@
 </template>
 
 <script>
-import { mountRoot } from '../service/mount'
 import eventBus from './../service/eventBus'
 export default {
   data () {
@@ -21,22 +20,19 @@ export default {
       return this.$store.state.application
     },
     viewport () {
-      return this.$store.getters['application/getPluginByPosition']('viewport')
+      return this.$store.getters['application/getPluginsByPosition']('viewport')
     }
   },
   methods: {
-    mountRoot () {
-      let instanceInfo = this.viewportStore.instances.get(this.viewportStore.rootInstanceKey)
-      let component = this.applicationStore.pluginInstance.get(instanceInfo.__className__)
-      mountRoot(this.$refs.viewport, component, false, this.viewportStore.rootInstanceKey, this.$store)
-    },
     mouseleave () {
       eventBus.viewportMouseout()
     }
   },
   mounted () {
-    this.$store.commit('viewport/initViewport', this.$refs.viewport)
-    this.mountRoot()
+    this.$store.commit('viewport/initViewport', {
+      viewportDom: this.$refs.viewport,
+      store: this.$store
+    })
   }
 }
 </script>

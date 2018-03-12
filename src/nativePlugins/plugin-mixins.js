@@ -44,7 +44,9 @@ export var editorToolMixins = {
   },
   methods: {
     initCurrentField () {
+      // 从 vm 上主动获取data
       let props = this.instanceInfo.vm.$data
+      // 映射flied
       let val = get(props, this.field)
       if (val) {
         this.value = val

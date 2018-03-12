@@ -1,6 +1,6 @@
 <template>
-  <div class="button-editor">
-    button-editor
+  <div class="editor-tool-manager">
+    toolManager
   </div>
 </template>
 
@@ -9,10 +9,15 @@ export default {
   data () {
     return {
     }
+  },
+  computed: {
+    editors () {
+      return {}
+    }
   }
 }
 </script>
 <style lang="less" type="text/less">
-  .button-editor {
+  .editor-tool-manager {
   }
 </style>

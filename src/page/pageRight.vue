@@ -12,7 +12,7 @@ export default {
   },
   computed: {
     tool () {
-      return this.$store.getters['application/getPluginByPosition']('tool')
+      return this.$store.getters['application/getPluginsByPosition']('tool')
     }
   }
 }

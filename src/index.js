@@ -14,6 +14,7 @@ let WebEditor = {
     // 注册store 模块
     if (!store.state.application) {
       store.registerModule('application', application)
+      store.commit('application/init')
     }
     if (!store.state.viewport) {
       store.registerModule('viewport', viewport)

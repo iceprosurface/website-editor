@@ -24,13 +24,14 @@ export default {
       event.stopPropagation()
       this.$store.commit('viewport/setCurrentInstanceKey', this.__currentInstanceKey__)
     },
-    __mountChild__ (vm, childInstancekey) {
+    __mountChild__ (vm, childInstancekey, mounted) {
       let childInstance = this.$store.state.viewport.instances.get(childInstancekey)
       let component = this.$store.state.application.pluginInstance.get(childInstance.__className__)
       childInstance.vm = this
       mountSlot(vm, component, 'default', childInstancekey, this.$store)
         .then(elem => {
           // can do some to elem
+          mounted(elem)
         })
     }
   },

@@ -1,9 +1,6 @@
 <template>
-  <div class="container">
-    <div>container</div>
-    <div>
+  <div class="container" :style="computedStyle">
       <slot></slot>
-    </div>
   </div>
 </template>
 
@@ -11,6 +8,18 @@
 export default {
   data () {
     return {
+      styles: {
+        display: 'flex'
+      }
+    }
+  },
+  computed: {
+    computedStyle () {
+      return {
+        ...this.styles,
+        minHeight: '100px',
+        minWidth: '100px'
+      }
     }
   }
 }

@@ -13,4 +13,6 @@ const store = new Vuex.Store({
   }
 })
 
+store.commit('application/init')
+
 export default store
