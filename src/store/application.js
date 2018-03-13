@@ -13,8 +13,9 @@ const app = {
     componentSettings: new Map()
   },
   mutations: {
-    init (state) {
-      install.call(this, state)
+    init (state, store) {
+      console.log(store)
+      install.call(this, state, store)
     },
     setComponentProperies (state, {className, properies}) {
       state.componentSettings.set(className, properies)

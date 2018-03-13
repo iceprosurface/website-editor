@@ -1,6 +1,6 @@
 <template>
   <div class="page-left">
-    <component :is="key + '-ui'" v-for="key in keys" :key="key"></component>
+    <component :is="item.key" v-for="(item, key) in leftContainers" :key="key"></component>
   </div>
 </template>
 
@@ -12,8 +12,12 @@ export default {
     }
   },
   components: {},
+  computed: {
+    leftContainers () {
+      return this.$store.getters['application/getPluginsByPosition']('left-container')
+    }
+  },
   created () {
-    this.keys = this.$store.state.application.components
   }
 }
 </script>

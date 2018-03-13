@@ -1,16 +1,17 @@
 import Vue from 'vue'
 import { ui } from './plugin-mixins'
+import _camelCase from 'lodash/camelCase'
 // 自动注入 plugins 下每一个文件夹下的index.js文件
 const nativePlugins = require.context('./plugins/', true, /^\.\/[\w-]+\/index.js$/)
 
-export default function install (state) {
+export default function install (state, store) {
   var pluginsInstance = new Map()
   var pluginsUi = new Map()
   var paths = nativePlugins.keys()
   var componentsKeys = []
   let plugins = []
   var pluginList = paths.map(k => {
-    let key = k.match(/^\.\/([\w-]+)\/index.js$/)[1]
+    let key = _camelCase(k.match(/^\.\/([\w-]+)\/index.js$/)[1])
     let plugin = nativePlugins(k).default
     if (plugin.type === 'component') {
       // 混入ui的mixin， 如ui拖拽等
@@ -31,10 +32,15 @@ export default function install (state) {
     } else {
       // plugin 类， plugin 使用 install 注入Vue以及key
       // 由于plugin 是一个非常复杂的类，所以不用set逐一区别
+      let installedPlugin = plugin.install(Vue, key)
       plugins.push({
         key,
-        ...plugin.install(Vue, key)
+        ...installedPlugin
       })
+      // 注册每一个组件的store
+      if (installedPlugin.store) {
+        store.registerModule(_camelCase(key), installedPlugin.store)
+      }
     }
     return key
   })
