@@ -33,6 +33,8 @@ export default {
           // can do some to elem
           mounted(elem)
         })
+    },
+    __refresh__ () {
     }
   },
   mounted () {

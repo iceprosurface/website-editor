@@ -5,6 +5,8 @@ import uniqueId from 'lodash/fp/uniqueId'
 import get from 'lodash/get'
 import set from 'lodash/set'
 import { mountRoot } from '../service/mount'
+import Sortable from 'sortablejs'
+
 export default {
   namespaced: true,
   state: {
@@ -57,8 +59,6 @@ export default {
       } else {
         set(vm.$data, path, value)
       }
-      console.log(vm.$data)
-      console.log(vm)
       vm.$forceUpdate()
     },
     // TODO: 做成拖拽添加的
@@ -77,6 +77,46 @@ export default {
         onCreated: (instanceKey) => {
         }
       })
+    },
+    registerInnerDrag (state, {
+      parentInstanceKey,
+      dragParentDom,
+      onDragAdd,
+      groupName = 'instance-container'
+    }) {
+      const instance = state
+        .instances
+        .get(parentInstanceKey)
+      Sortable.create(dragParentDom, {
+        animation: 50,
+        group: {
+          name: groupName,
+          pull: true,
+          put: true
+        },
+        onAdd: (event) => {
+          switch (state.currentDragInfo.type) {
+            case 'new':
+              const newInfo = state.currentDragInfo.info;
+              const slotName = event.to.dataset.slotName;
+              this.commit('viewport/addInstance', {
+                gaeaKey: newInfo.gaeaKey,
+                parentInstanceKey,
+                indexPosition: event.newIndex,
+                preGaeaKey: newInfo.preGaeaKey,
+                slotName,
+                onCreated: newInstanceKey => {
+                  if (onDragAdd) {
+                    // e --event parentInstanceKey  --父instanceKey gaeaKey  -->component type
+                    // newInstanceKey  -> new instace Key
+                    onDragAdd.call(this, event, parentInstanceKey, newInfo.gaeaKey, newInstanceKey, slotName);
+                  }
+                }
+              })
+              break
+        }
+      })
+      }
     },
     addInstance (state, {
       instanceKey,

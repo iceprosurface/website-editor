@@ -29,7 +29,7 @@ export default {
           if (event.item.dataset.source) {
 
           } else if (event.item.dataset.gaeaKey) {
-            state.dragStartDataReady = false;
+            state.dragStartDataReady = false
             this.commit('startDrag', {
               type: 'new',
               dragStartParentDom: dragableMenu,
