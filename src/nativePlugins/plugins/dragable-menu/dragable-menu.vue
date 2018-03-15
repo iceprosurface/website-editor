@@ -1,6 +1,7 @@
 <template>
-  <div class="dragable-menu" ref="dragableMenu">
-    <component :is="key + '-ui'" v-for="key in keys" :key="key"></component>
+  <div class="dragable-menu" :class="{lock: lock}" ref="dragableMenu">
+    <component :is="key + '-ui'" v-for="key in keys" :key="key"
+               :data-key="key"></component>
   </div>
 </template>
 
@@ -13,6 +14,9 @@ export default {
   computed: {
     keys () {
       return this.$store.state.application.components
+    },
+    lock () {
+      return this.$store.state[this.__className__].lock
     }
   },
   mounted () {
@@ -22,5 +26,37 @@ export default {
 </script>
 <style lang="less" type="text/less">
   .dragable-menu {
+    .dragging-content {
+      display: none;
+    }
+    .ui-content {
+      display: block;
+    }
+    .sortable-ghost {
+      .ui-content {
+        display: block;
+      }
+      .dragging-content {
+        display: none;
+      }
+    }
+  }
+  .sortable-drag {
+    .ui-content {
+      display: none;
+    }
+    .dragging-content {
+      display: block;
+    }
+  }
+  .viewport {
+    .sortable-drag, .sortable-ghost {
+      .ui-content {
+        display: none;
+      }
+      .dragging-content {
+        display: block;
+      }
+    }
   }
 </style>

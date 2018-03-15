@@ -6,11 +6,13 @@ export default {
   namespaced: true,
   state: {
     __className__: null,
-    dragStartDataReady: false
+    dragStartDataReady: false,
+    lock: false
   },
   mutations: {
-    endDrag () {
-
+    endDrag (state) {
+      this.commit('viewport/endDrag')
+      state.lock = false
     },
     registerDragMenus (state, dragableMenu) {
       let lastDragStartIndex = -1
@@ -25,19 +27,16 @@ export default {
         sort: false,
         delay: 0,
         onStart: (event) => {
+          state.lock = true
+          let item = event.item
           lastDragStartIndex = event.oldIndex
-          if (event.item.dataset.source) {
-
-          } else if (event.item.dataset.gaeaKey) {
-            state.dragStartDataReady = false
-            this.commit('startDrag', {
-              type: 'new',
-              dragStartParentDom: dragableMenu,
-              dragStartIndex: event.oldIndex
-            })
-            // 开始拖拽完毕
-            state.dragStartDataReady = true
-          }
+          state.dragStartDataReady = false
+          this.commit('viewport/setDragInfo', {
+            type: 'new',
+            className: item.dataset.key,
+            dragStartParentDom: dragableMenu,
+            dragStartIndex: event.oldIndex
+          })
         },
         onEnd: (event) => {
           this.commit(state.__className__ + '/endDrag')

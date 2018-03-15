@@ -1,5 +1,5 @@
 <template>
-  <div class="page-middle" @mouseleave="mouseleave">
+  <div class="page-middle viewport" @mouseleave="mouseleave">
     <component :is="item.key" v-for="(item, key) in viewport" :key="key"></component>
     <div class="page-root" ref="viewport"></div>
   </div>

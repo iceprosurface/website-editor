@@ -5,7 +5,7 @@ import uniqueId from 'lodash/fp/uniqueId'
 import get from 'lodash/get'
 import set from 'lodash/set'
 import { mountRoot } from '../service/mount'
-import Sortable from 'sortablejs'
+import * as Sortable from 'sortablejs'
 
 export default {
   namespaced: true,
@@ -14,10 +14,17 @@ export default {
     currentInstanceKey: null,
     viewportDom: null,
     rootInstanceKey: null,
-    instances: new Map()
+    instances: new Map(),
+    dragInfo: null
     // instancesDoms: new Map()
   },
   mutations: {
+    setDragInfo (state, info) {
+      state.dragInfo = info
+    },
+    endDrag (state) {
+      state.dragInfo = null
+    },
     setCurrentHoverInstanceKey (state, key) {
       state.currentHoverInstanceKey = key
     },
@@ -61,23 +68,6 @@ export default {
       }
       vm.$forceUpdate()
     },
-    // TODO: 做成拖拽添加的
-    uiClick (state, className) {
-      // 使用className创建一个元素
-      console.log(className)
-      if (!state.currentInstanceKey) {
-        return
-      }
-      let instanceInfo = state.instances.get(state.currentInstanceKey)
-      this.commit('viewport/addInstance', {
-        instanceKey: null,
-        className: className,
-        parentClassName: instanceInfo.__className__,
-        parentInstanceKey: instanceInfo.__instanceKey__,
-        onCreated: (instanceKey) => {
-        }
-      })
-    },
     registerInnerDrag (state, {
       parentInstanceKey,
       dragParentDom,
@@ -92,31 +82,41 @@ export default {
         group: {
           name: groupName,
           pull: true,
-          put: true
+          put: ['dragable-menu', groupName]
+        },
+        onStart: (event) => {
+          let item = event.item
+          this.commit('viewport/setDragInfo', {
+            type: 'move',
+            className: item.dataset.key
+          })
+        },
+        onEnd: (event) => {
+          this.commit('viewport/endDrag')
         },
         onAdd: (event) => {
-          switch (state.currentDragInfo.type) {
+          let slotName = 'default'
+          switch (state.dragInfo.type) {
             case 'new':
-              const newInfo = state.currentDragInfo.info;
-              const slotName = event.to.dataset.slotName;
+              const newInfo = state.dragInfo
               this.commit('viewport/addInstance', {
-                gaeaKey: newInfo.gaeaKey,
+                className: newInfo.className,
                 parentInstanceKey,
                 indexPosition: event.newIndex,
-                preGaeaKey: newInfo.preGaeaKey,
-                slotName,
+                slotName: slotName,
+                parentClassName: instance.__className__,
                 onCreated: newInstanceKey => {
                   if (onDragAdd) {
                     // e --event parentInstanceKey  --父instanceKey gaeaKey  -->component type
                     // newInstanceKey  -> new instace Key
-                    onDragAdd.call(this, event, parentInstanceKey, newInfo.gaeaKey, newInstanceKey, slotName);
+                    onDragAdd.call(this, event, parentInstanceKey, newInfo.className, newInstanceKey, slotName)
                   }
                 }
               })
               break
+          }
         }
       })
-      }
     },
     addInstance (state, {
       instanceKey,

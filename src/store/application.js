@@ -10,7 +10,8 @@ const app = {
     plugins: null,
     pluginUi: null,
     pluginInstance: null,
-    componentSettings: new Map()
+    componentSettings: new Map(),
+    pluginSetting: new Map()
   },
   mutations: {
     init (state, store) {

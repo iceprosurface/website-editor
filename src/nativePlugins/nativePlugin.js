@@ -7,6 +7,7 @@ const nativePlugins = require.context('./plugins/', true, /^\.\/[\w-]+\/index.js
 export default function install (state, store) {
   var pluginsInstance = new Map()
   var pluginsUi = new Map()
+  var pluginSetting = new Map()
   var paths = nativePlugins.keys()
   var componentsKeys = []
   let plugins = []
@@ -22,6 +23,7 @@ export default function install (state, store) {
       let pluginUiTmp = Vue.component(`${key}-ui`, Vue.extend(plugin.Ui))
       // 为每一个实例注入 __className__
       pluginInstanceTmp.prototype.__className__ = key
+      pluginInstanceTmp.prototype._isContainer = plugin.isContainer
       pluginUiTmp.prototype.__className__ = key
       // 独立的设置set以空间换时间
       pluginsInstance.set(key, pluginInstanceTmp)
@@ -42,6 +44,7 @@ export default function install (state, store) {
         store.registerModule(_camelCase(key), installedPlugin.store)
       }
     }
+    pluginSetting.set(_camelCase(key), plugin)
     return key
   })
   state.pluginInstance = pluginsInstance
@@ -49,4 +52,5 @@ export default function install (state, store) {
   state.pluginList = pluginList
   state.components = componentsKeys
   state.plugins = plugins
+  state.pluginSetting = pluginSetting
 }

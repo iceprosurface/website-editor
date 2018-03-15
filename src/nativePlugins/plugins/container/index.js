@@ -5,5 +5,6 @@ export default {
   Ui: containerUi,
   instance: containerInstance,
   properties,
+  isContainer: true,
   type: 'component'
 }

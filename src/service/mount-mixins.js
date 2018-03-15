@@ -35,6 +35,15 @@ export default {
         })
     },
     __refresh__ () {
+      let instance = this.$store.state.viewport.instances.get(this.__currentInstanceKey__)
+      if (this.$store.state.application.pluginSetting.has(instance.__className__)) {
+        this.$store.commit('viewport/registerInnerDrag', {
+          parentInstanceKey: this.__currentInstanceKey__,
+          dragParentDom: this.$el,
+          onDragAdd () {
+          }
+        })
+      }
     }
   },
   mounted () {
@@ -52,5 +61,6 @@ export default {
     // 设置当前实例对象
     this.__currentInstanceInfo__.vm = this
     this.__currentInstanceInfo__.data = this.$data
+    this.__refresh__()
   }
 }

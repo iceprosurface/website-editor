@@ -11,8 +11,17 @@ export default {
       isShow: false
     }
   },
+  computed: {
+    guildLineShow () {
+      return !this.$store.state.viewport.dragInfo
+    }
+  },
   methods: {
     calc () {
+      if (!this.guildLineShow) {
+        this.isShow = false
+        return
+      }
       if (this.$store.state.viewport.currentHoverInstanceKey === null) {
         this.isShow = false
         return
