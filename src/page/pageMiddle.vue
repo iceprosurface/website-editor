@@ -40,7 +40,6 @@ export default {
 <style lang="less" type="text/less">
   .page-middle {
     flex: 1;
-    border: 1px solid #333;
     .page-root {
       width: 100%;
       height: 100%;

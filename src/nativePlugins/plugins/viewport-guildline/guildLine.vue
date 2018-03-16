@@ -1,9 +1,8 @@
 <template>
-  <div class="guildline-container" :style="dymStyle" v-show="isShow"></div>
+  <div class="guildline-container" :style="dymStyle" v-show="isShow && guildLineShow"></div>
 </template>
 
 <script>
-import eventBus from './../../../service/eventBus'
 export default {
   data () {
     return {
@@ -18,10 +17,6 @@ export default {
   },
   methods: {
     calc () {
-      if (!this.guildLineShow) {
-        this.isShow = false
-        return
-      }
       if (this.$store.state.viewport.currentHoverInstanceKey === null) {
         this.isShow = false
         return
@@ -44,12 +39,12 @@ export default {
     }
   },
   destroyed () {
-    eventBus.$off('dom-mouse-hover', this.calc)
-    eventBus.$off('viewport-mouseout', this.setShowOff)
+    this.websiteEditEventBus.$off('dom-mouse-hover', this.calc)
+    this.websiteEditEventBus.$off('viewport-mouseout', this.setShowOff)
   },
   mounted () {
-    eventBus.$on('dom-mouse-hover', this.calc)
-    eventBus.$on('viewport-mouseout', this.setShowOff)
+    this.websiteEditEventBus.$on('dom-mouse-hover', this.calc)
+    this.websiteEditEventBus.$on('viewport-mouseout', this.setShowOff)
   }
 }
 </script>

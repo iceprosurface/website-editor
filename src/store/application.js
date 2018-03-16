@@ -15,7 +15,6 @@ const app = {
   },
   mutations: {
     init (state, store) {
-      console.log(store)
       install.call(this, state, store)
     },
     setComponentProperies (state, {className, properies}) {

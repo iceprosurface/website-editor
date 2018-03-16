@@ -23,7 +23,7 @@ export default {
 </script>
 <style lang="less" type="text/less">
   .page-left {
-    width: 140px;
-    border: 1px solid #333;
+    width: 300px;
+    border-right: 1px solid #ddd;
   }
 </style>

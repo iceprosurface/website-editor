@@ -3,6 +3,7 @@
  */
 import { mountSlot } from './mount'
 import eventBus from './eventBus'
+import { addClass } from './dom'
 export default {
   data () {
     return {
@@ -24,11 +25,11 @@ export default {
       event.stopPropagation()
       this.$store.commit('viewport/setCurrentInstanceKey', this.__currentInstanceKey__)
     },
-    __mountChild__ (vm, childInstancekey, mounted) {
+    __mountChild__ (vm, childInstancekey, slotName, mounted) {
       let childInstance = this.$store.state.viewport.instances.get(childInstancekey)
       let component = this.$store.state.application.pluginInstance.get(childInstance.__className__)
       childInstance.vm = this
-      mountSlot(vm, component, 'default', childInstancekey, this.$store)
+      mountSlot(vm, component, slotName, childInstancekey, this.$store)
         .then(elem => {
           // can do some to elem
           mounted(elem)
@@ -36,7 +37,11 @@ export default {
     },
     __refresh__ () {
       let instance = this.$store.state.viewport.instances.get(this.__currentInstanceKey__)
-      if (this.$store.state.application.pluginSetting.has(instance.__className__)) {
+      let originPlugin = this.$store.state.application.pluginSetting.get(instance.__className__)
+      if (!originPlugin) {
+        return
+      }
+      if (originPlugin.isContainer) {
         this.$store.commit('viewport/registerInnerDrag', {
           parentInstanceKey: this.__currentInstanceKey__,
           dragParentDom: this.$el,
@@ -47,11 +52,11 @@ export default {
     }
   },
   mounted () {
+    addClass(this.$el, 'component-instance')
     if (!this.__currentInstanceKey__) {
       return
     }
     this.__registerEvent()
-
     this.__currentInstanceInfo__ = this
       .$store
       .state

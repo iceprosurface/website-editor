@@ -1,6 +1,6 @@
 <template>
   <div class="button-ui">
-    <span class="ui-content">button</span>
+    <div class="ui-content">button</div>
     <div class="dragging-content button-dragging">
       <button>默认文字</button>
     </div>

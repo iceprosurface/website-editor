@@ -6,7 +6,7 @@ import get from 'lodash/get'
 import set from 'lodash/set'
 import { mountRoot } from '../service/mount'
 import * as Sortable from 'sortablejs'
-
+import event from '../service/eventBus'
 export default {
   namespaced: true,
   state: {
@@ -20,9 +20,11 @@ export default {
   },
   mutations: {
     setDragInfo (state, info) {
+      event.$emit('drag-start', info)
       state.dragInfo = info
     },
     endDrag (state) {
+      event.$emit('drag-end')
       state.dragInfo = null
     },
     setCurrentHoverInstanceKey (state, key) {
@@ -42,6 +44,8 @@ export default {
         instanceKey: rootInstanceKey,
         className: 'container',
         parentInstanceKey: null,
+        indexPosition: 0,
+        slotName: 'default',
         onMount (instancekey, mounted) {
           let instanceInfo = state.instances.get(rootInstanceKey)
           let component = store.state.application.pluginInstance.get(instanceInfo.__className__)
@@ -58,7 +62,6 @@ export default {
     setInstanceProps (state, {vm, path, value}) {
       if (Object.prototype.toString.call(value) === '[object Object]') {
         let oldValue = get(vm.$data, path)
-        console.log(oldValue)
         set(vm.$data, path, {
           ...oldValue,
           ...value
@@ -78,6 +81,7 @@ export default {
         .instances
         .get(parentInstanceKey)
       Sortable.create(dragParentDom, {
+        draggable: '.component-instance',
         animation: 50,
         group: {
           name: groupName,
@@ -93,6 +97,17 @@ export default {
         },
         onEnd: (event) => {
           this.commit('viewport/endDrag')
+        },
+        onUpdate: (event) => {
+          let slotName = event.from.dataset.slotName
+          // 同一个父级下子元素交换父级
+          // 取消 srotable 对 dom 的修改, 让元素回到最初的位置即可复原
+          this.commit('viewport/horizontalMoveInstance', {
+            parentKey: parentInstanceKey,
+            beforeIndex: event.oldIndex,
+            afterIndex: event.newIndex,
+            slotName
+          })
         },
         onAdd: (event) => {
           let slotName = 'default'
@@ -118,13 +133,41 @@ export default {
         }
       })
     },
+    horizontalMoveInstance (state, {
+      parentKey,
+      beforeIndex,
+      afterIndex,
+      slotName}) {
+      const parentInstance = state
+        .instances
+        .get(parentKey)
+      if (beforeIndex < afterIndex) {
+        // 从左到右
+        for (let index = beforeIndex; index < afterIndex; index++) {
+          const beforeUniqueKey = parentInstance.slots[slotName][index]
+          const afterUniqueKey = parentInstance.slots[slotName][index + 1]
+          parentInstance.slots[slotName][index] = afterUniqueKey
+          parentInstance.slots[slotName][index + 1] = beforeUniqueKey
+        }
+      } else {
+        // 从右到左
+        for (let index = beforeIndex; index > afterIndex; index--) {
+          const beforeUniqueKey = parentInstance.slots[slotName][index]
+          const afterUniqueKey = parentInstance.slots[slotName][index - 1]
+          parentInstance.slots[slotName][index] = afterUniqueKey
+          parentInstance.slots[slotName][index - 1] = beforeUniqueKey
+        }
+      }
+    },
     addInstance (state, {
       instanceKey,
       className,
       parentClassName,
       parentInstanceKey,
       onCreated,
-      onMount
+      onMount,
+      slotName,
+      indexPosition
     }) {
       let key = instanceKey || uniqueId('_instance_')
       state
@@ -135,6 +178,7 @@ export default {
           data: {
             props: null
           },
+          slots: {},
           vm: null,
           parentClassName,
           parentInstanceKey
@@ -149,27 +193,29 @@ export default {
         let instanceInfo = state
           .instances
           .get(parentInstanceKey)
-        instanceInfo.vm.__mountChild__(instanceInfo.vm, key, () => {
+        // 在slot下面记录对应的instanceKey
+        if (!instanceInfo.slots[slotName]) {
+          instanceInfo.slots[slotName] = []
+        }
+        instanceInfo
+          .slots[slotName]
+          .splice(indexPosition, 0, key)
+        instanceInfo.vm.__mountChild__(instanceInfo.vm, key, slotName, () => {
           // 由於組件異步，這裡需要等一個回調
           this.commit('viewport/setInstanceProps', {
             vm: currentInstance.vm,
-            path: 'styles',
-            value: {
-              border: '1px dashed #000',
-              padding: '1px'
-            }
+            path: 'instanceKey',
+            value: key
           })
+          console.log(instanceInfo.vm)
         })
       } else {
         onMount(key, () => {
           // 由於組件異步，這裡需要等一個回調
           this.commit('viewport/setInstanceProps', {
             vm: currentInstance.vm,
-            path: 'styles',
-            value: {
-              border: '1px dashed #000',
-              padding: '1px'
-            }
+            path: 'instanceKey',
+            value: key
           })
         })
       }
