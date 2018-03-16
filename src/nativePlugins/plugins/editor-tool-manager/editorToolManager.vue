@@ -11,8 +11,12 @@ export default {
     }
   },
   computed: {
+    editorComponents: {
+    },
     editors () {
-      return {}
+      return {
+
+      }
     }
   }
 }

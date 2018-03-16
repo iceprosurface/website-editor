@@ -27,10 +27,10 @@ export default {
       const targetBoundingClientRect = instanceDom.$el.getBoundingClientRect()
       const viewportBoundingClientRect = this.$store.state.viewport.viewportDom.getBoundingClientRect()
       this.dymStyle = {
-        width: `${targetBoundingClientRect.width - 1}px`,
-        height: `${targetBoundingClientRect.height - 1}px`,
-        top: `${targetBoundingClientRect.top - viewportBoundingClientRect.top}px`,
-        left: `${targetBoundingClientRect.left - viewportBoundingClientRect.left}px`
+        width: `${targetBoundingClientRect.width - 2}px`,
+        height: `${targetBoundingClientRect.height - 2}px`,
+        top: `${targetBoundingClientRect.top - viewportBoundingClientRect.top + 1}px`,
+        left: `${targetBoundingClientRect.left - viewportBoundingClientRect.left + 1}px`
       }
       this.isShow = true
     },
@@ -51,8 +51,9 @@ export default {
 <style lang="less" type="text/less" scoped>
   .guildline-container {
     position: absolute;
-    border: 1px solid #3F51B5;
+    border: 1px solid #23b7e5;
     pointer-events: none;
     transition: all .1s ease;
+    z-index: 1001;
   }
 </style>

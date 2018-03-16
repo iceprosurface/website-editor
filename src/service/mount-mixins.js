@@ -65,6 +65,7 @@ export default {
       .get(this.__currentInstanceKey__)
     // 设置当前实例对象
     this.__currentInstanceInfo__.vm = this
+    // 同步data属性
     this.__currentInstanceInfo__.data = this.$data
     this.__refresh__()
   }
