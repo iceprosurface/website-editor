@@ -31,7 +31,7 @@ export default {
           let item = event.item
           lastDragStartIndex = event.oldIndex
           state.dragStartDataReady = false
-          this.commit('viewport/setDragInfo', {
+          this.commit('viewport/setDrag', {
             type: 'new',
             className: item.dataset.key,
             dragStartParentDom: dragableMenu,

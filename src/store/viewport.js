@@ -19,9 +19,19 @@ export default {
     // instancesDoms: new Map()
   },
   mutations: {
+    setDrag (state, drag) {
+      event.$emit('drag-start', drag)
+      state.dragInfo = drag
+    },
     setDragInfo (state, info) {
-      event.$emit('drag-start', info)
-      state.dragInfo = info
+      let dragInfo = state.dragInfo
+      if (!dragInfo.info) {
+        state.dragInfo.info = {}
+      }
+      state.dragInfo.info = {
+        ...state.dragInfo.info,
+        ...info
+      }
     },
     endDrag (state) {
       event.$emit('drag-end')
@@ -89,10 +99,17 @@ export default {
           put: ['dragable-menu', groupName]
         },
         onStart: (event) => {
+          // 能对innerDrag作出响应的必定是内部拖拽事件
           let item = event.item
-          this.commit('viewport/setDragInfo', {
-            type: 'move',
-            className: item.dataset.key
+          let slotName = event.from.dataset.slotName
+          this.commit('viewport/setDrag', {
+            type: 'viewport',
+            className: item.dataset.key,
+            dragStartParentDom: dragParentDom,
+            dragStartIndex: event.oldIndex,
+            info: {
+              domInstanceKey: instance.slots[slotName][event.oldIndex]
+            }
           })
         },
         onEnd: (event) => {
@@ -107,6 +124,23 @@ export default {
             beforeIndex: event.oldIndex,
             afterIndex: event.newIndex,
             slotName
+          })
+        },
+        onRemove: (event) => {
+          // onEnd 在其之后执行，会清除拖拽目标的信息 减少了一个子元素，一定是发生在 viewport 区域元素发生跨父级拖拽时
+          let toSlotName = event.to.dataset.slotName
+          let fromSlotName = event.from.dataset.slotName
+          const dragTargetKey = state
+            .instances
+            .get(parentInstanceKey)
+            .slots[toSlotName][state.dragInfo.dragStartIndex]
+          const dragViewportInfo = state.dragInfo.info
+          this.commit('viewport/moveInstance', {
+            sourceTargetKey: dragTargetKey,
+            targetParentKey: dragViewportInfo.targetInstanceKey,
+            targetIndex: dragViewportInfo.targetIndex,
+            fromSlotName,
+            toSlotName
           })
         },
         onAdd: (event) => {
@@ -129,15 +163,71 @@ export default {
                 }
               })
               break
+            case 'viewport':
+              // 说明是从某个viewport中的可拖拽元素
+              // 拖拽到另外一个元素
+              // 增加操作将不再这里实现
+              // 而是通过监控实例的消失实现，这里只是设置目标和index
+              this.commit('viewport/setDragInfo', {
+                index: event.index,
+                targetInstanceKey: parentInstanceKey
+              })
+              break
           }
         }
       })
+    },
+    // 用于对跨层级拖拽作出支持
+    moveInstance (state, {
+      sourceTargetKey,
+      targetParentKey,
+      targetIndex,
+      fromSlotName,
+      toSlotName
+    }) {
+      const sourceTargetInstance = state
+        .instances
+        .get(sourceTargetKey)
+      const sourceParentInstance = state
+        .instances
+        .get(sourceTargetInstance.parentInstanceKey)
+      const targetParentInstance = state
+        .instances
+        .get(targetParentKey)
+      if (sourceTargetInstance.parentInstanceKey !== targetParentKey) { // 跨越层级
+        // 修改拖拽元素的 parentMapUniqueKey
+        sourceTargetInstance.parentInstanceKey = targetParentKey
+        // 拖拽目标添加 instance
+        if (!targetParentInstance.slots[toSlotName]) {
+          targetParentInstance
+            .slots[toSlotName] = []
+        }
+        targetParentInstance
+          .slots[toSlotName]
+          .splice(targetIndex, 0, sourceTargetKey)
+
+        // 拖拽源删除 instance
+        sourceParentInstance.slots[fromSlotName] = sourceParentInstance
+          .slots[fromSlotName]
+          .filter(childKey => childKey !== sourceTargetKey)
+      } else { // 同层级
+        this.commit('viewport/horizontalMoveInstance', {
+          parentKey: targetParentKey,
+          beforeIndex: sourceParentInstance
+            .slots[fromSlotName]
+            .findIndex(childKey => childKey === sourceTargetKey),
+          afterIndex: targetIndex
+        })
+      }
+      // 触发 VueX 对map的检查
+      state.instances = new Map(state.instances)
     },
     horizontalMoveInstance (state, {
       parentKey,
       beforeIndex,
       afterIndex,
-      slotName}) {
+      slotName
+    }) {
       const parentInstance = state
         .instances
         .get(parentKey)
