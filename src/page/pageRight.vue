@@ -20,6 +20,7 @@ export default {
 
 <style lang="less" type="text/less">
   .page-right {
+    position: relative;
     width: 120px;
     border-left: 1px solid #ddd;
   }

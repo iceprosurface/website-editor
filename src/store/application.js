@@ -24,6 +24,9 @@ const app = {
   getters: {
     getPluginsByPosition: (state) => (position) => {
       return state.plugins.filter(plugin => plugin.type !== 'component' && position === plugin.position)
+    },
+    getEditorsByClassName: (state) => (className) => {
+      return state.pluginSetting.get(className).properties
     }
   }
 }

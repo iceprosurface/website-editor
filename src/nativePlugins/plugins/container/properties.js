@@ -7,7 +7,7 @@ export default {
   editors: [
     '图层',
     {
-      type: 'box-editor'
+      type: 'boxEditor'
     }
   ]
 }

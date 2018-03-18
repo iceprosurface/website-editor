@@ -1,23 +1,39 @@
 <template>
   <div class="editor-tool-manager">
-    toolManager
+    <div>toolManager</div>
+    <template v-for="(editor, index) in editors" >
+      <div class="cut-off" :key="index" v-if="typeof editor === 'string'">
+        {{editor}}
+      </div>
+      <div :key="index" v-else>
+        <component :instance="currentInstance" :is="editor.type" :field="editor.field" :text="editor.text"></component>
+      </div>
+    </template>
   </div>
 </template>
 
 <script>
+import _camelCase from 'lodash/camelCase'
 export default {
   data () {
-    return {
-    }
+    return {}
   },
   computed: {
-    editorComponents: {
+    editorComponents () {
+      return this.$store.state.viewport.getPluginsByPosition('editor-tool')
+    },
+    currentInstance () {
+      return this.$store.getters['viewport/currentInstance']
     },
     editors () {
-      return {
-
+      if (this.currentInstance) {
+        return this.$store.getters['application/getEditorsByClassName'](this.currentInstance.__className__).editors
       }
+      return []
     }
+  },
+  method: {
+    camelCase: _camelCase
   }
 }
 </script>

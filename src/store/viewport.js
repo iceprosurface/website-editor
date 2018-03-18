@@ -18,6 +18,14 @@ export default {
     dragInfo: null
     // instancesDoms: new Map()
   },
+  getters: {
+    currentInstance: (state) => {
+      if (state.currentInstanceKey) {
+        return state.instances.get(state.currentInstanceKey)
+      }
+      return null
+    }
+  },
   mutations: {
     setDrag (state, drag) {
       event.$emit('drag-start', drag)
